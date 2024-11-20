@@ -46,4 +46,4 @@ model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['ac
 model.fit(trainGenerator,  validation_data=validGenerator, epochs=epochs)
 
 path_for_saved_model = "C:/Users/marko/Desktop/computer vision project/garbage_classification_dataset_model/model.h5"
-model.save(path_for_saved_model)
+model.save("model_name.keras", save_format="keras")
