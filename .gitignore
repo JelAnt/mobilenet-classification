@@ -1,0 +1,26 @@
+# Ignore the virtual environment
+venv/
+
+# Ignore Python cache files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Ignore log files and temporary files
+*.log
+*.tmp
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore IDE settings (e.g., VSCode, PyCharm)
+.vscode/
+.idea/
+
+# ignore image folders
+garbage_classification_dataset_model/
+garbage_classification/
