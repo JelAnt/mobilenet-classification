@@ -3,45 +3,42 @@ import numpy as np
 from tensorflow.keras.models import load_model
 import os
 
-categories = os.listdir("C:/Users/marko/Desktop/computer vision project/garbage_classification_dataset_model/validate")
+categories = os.listdir("C:/Users/marko/Desktop/computer vision project/garbage_classification_dataset_model/validate") # get a list of all folders name inside the validation folder
 
+model = load_model('C:/Users/marko/Desktop/computer vision project/garbage_classification_dataset_model/model.h5') # load the object detection model
 
-model = load_model('C:/Users/marko/Desktop/computer vision project/garbage_classification_dataset_model/model.h5')
+cap = cv2.VideoCapture(0) # 0 is the default camera, load it up.
 
-video_path = 0
-cap = cv2.VideoCapture(video_path)
-
-if not cap.isOpened():
-    print("Error: Could not open video.")
+if not cap.isOpened(): # check if camera is working
+    print("camera error")
     exit()
 
 
-input_size = (224, 224) 
+input_size = (224, 224) # specify the frame size
 
 while True:
-    ret, frame = cap.read()
+    ret, frame = cap.read() # read the frame from the camera
     if not ret:
+        break # if the frame was not read succesfully break out
+
+    
+    resized_frame = cv2.resize(frame, input_size) # resize the frame
+    input_frame = np.expand_dims(resized_frame, axis=0) / 255.0  # adds a batch dimension and normalizes the pixel values from 0 to 1
+
+    
+    prediction = model.predict(input_frame).ravel() # predicts the current frame
+    predicted_class = np.argmax(prediction)  # assigns the class based on probability
+    predicted_label = categories[predicted_class]  # assigns the label based on the previously assigned class
+    confidence = prediction[predicted_class] * 100 # calculates and assigns the confidence score
+
+    text = f"Category: {predicted_label}, Confidence: {confidence:.2f}%" # create text that will be shown on the frames
+    cv2.putText(frame, text, (10, 30), # place the text on the frame
+                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2) # specify text attributes like the color, thickness, font size, font type etc.
+    cv2.imshow("Video detection", frame) # display the video
+    
+    if cv2.waitKey(1) & 0xFF == ord('q'): # breaks out of the loop if q is pressed
         break
 
-    
-    resized_frame = cv2.resize(frame, input_size)
-    input_frame = np.expand_dims(resized_frame, axis=0) / 255.0 
 
-    
-    prediction = model.predict(input_frame).ravel()
-    predicted_class = np.argmax(prediction)  
-    predicted_label = categories[predicted_class]  
-    confidence = prediction[predicted_class] * 100
-
-    text = f"Category: {predicted_label}, Confidence: {confidence:.2f}%"
-    cv2.putText(frame, text, (10, 30), 
-                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-    cv2.imshow("Video Detection", frame)
-
-    
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
-
-cap.release()
-cv2.destroyAllWindows()
+cap.release() # stops using the camera
+cv2.destroyAllWindows() # closes all windows
